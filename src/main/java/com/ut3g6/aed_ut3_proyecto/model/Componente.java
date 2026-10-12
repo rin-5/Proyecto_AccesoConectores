@@ -11,6 +11,8 @@ public class Componente {
         this.id_art = id_art;
     }
 
+    // GETTERS
+
     public char getId_componente() {
         return id_componente;
     }
@@ -22,6 +24,20 @@ public class Componente {
     public int getId_art() {
         return id_art;
     }
+
+    // SETTERS
+
+    public void setId_componente(char id_componente){
+        this.id_componente = id_componente;}
+
+    public void setDescripcion(String descripcion){this.descripcion = descripcion;}
+
+    public void setId_art (int id_art){
+        this.id_art = id_art;
+    }
+
+
+
     
     
 }
