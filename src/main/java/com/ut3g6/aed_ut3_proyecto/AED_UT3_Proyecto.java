@@ -12,10 +12,11 @@ public class AED_UT3_Proyecto {
     public static void main(String[] args) {
         try (Connection conexion = Conexion.getConexion()) {
             if (conexion != null && !conexion.isClosed()) {
-                System.out.println("Conexión establecida correctamente.");
+                System.out.println("Conexión establecida correctamente con la base de datos.");
             }
         } catch (SQLException e) {
             System.out.println("Error al conectar con la base de datos.");
+       
         }
     }
 
