@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class ComponenteController {
+public class ComponenteDAO {
 
     private final List<Componente> componentes;
 
