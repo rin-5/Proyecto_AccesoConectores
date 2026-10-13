@@ -10,7 +10,7 @@ public class ComponenteDAO {
 
     private final List<Componente> componentes;
 
-    public ComponenteController() {
+    public ComponenteDAO() {
         componentes = new ArrayList<>();
     }
 
