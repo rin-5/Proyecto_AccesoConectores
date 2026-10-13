@@ -29,16 +29,16 @@ public class ComponenteDAO {
         return new ArrayList<>(componentes);
     }
 
-    public Componente buscarComponente(String id) {
+    public Componente buscarComponente(char id) {
         for (Componente componente : componentes) {
-            if (componente.getId_componente().equals(id)) {
+            if (componente.getId_componente() == id) {
                 return componente;
             }
         }
         return null;
     }
 
-    public boolean modificarComponente(String id, String descripcion) {
+    public boolean modificarComponente(char id, String descripcion) {
         Componente componente = buscarComponente(id);
 
         if (componente != null) {
@@ -49,7 +49,7 @@ public class ComponenteDAO {
         return false;
     }
 
-    public boolean eliminarComponente(String id) {
+    public boolean eliminarComponente(char id) {
         Componente componente = buscarComponente(id);
 
         if (componente != null) {
