@@ -15,7 +15,7 @@ public class AED_UT3_Proyecto {
         try (Connection conexion = Conexion.getConexion()) {
             if (conexion != null && !conexion.isClosed()) {
                 System.out.println("Conexión establecida correctamente con la base de datos.");
-                Application.launch(MenuPrincipalView.class, args);
+                Application.launch(MainMenuView.class, args);
             }
         } catch (SQLException e) {
             System.out.println("Error al conectar con la base de datos.");
