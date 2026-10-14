@@ -1,6 +1,9 @@
 
 package com.ut3g6.aed_ut3_proyecto.view;
 
+import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
+import org.kordamp.ikonli.javafx.FontIcon;
+
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -45,13 +48,13 @@ public class MainMenuView extends Application {
         opciones.setVgap(20);
 
         Button btnArticulos = crearBoton(
-                "Artículos", "Consultar y gestionar artículos");
+                "Artículos", "Consultar y gestionar artículos", FontAwesomeSolid.BOX);
         Button btnDepositos = crearBoton(
-                "Depósitos", "Gestionar depósitos");
+                "Depósitos", "Gestionar depósitos", FontAwesomeSolid.WAREHOUSE);
         Button btnEstantes = crearBoton(
-                "Estantes", "Gestionar estantes");
+                "Estantes", "Gestionar estantes", FontAwesomeSolid.TH_LARGE);
         Button btnComponentes = crearBoton(
-                "Componentes", "Gestionar componentes");
+                "Componentes", "Gestionar componentes", FontAwesomeSolid.COG);
 
         opciones.add(btnArticulos, 0, 0);
         opciones.add(btnDepositos, 1, 0);
@@ -86,16 +89,29 @@ public class MainMenuView extends Application {
         stage.show();
     }
 
-    private Button crearBoton(String titulo, String descripcion) {
-        Button boton = new Button(titulo + "\n" + descripcion);
-        boton.setPrefSize(250, 110);
-        boton.setWrapText(true);
+    private Button crearBoton(String titulo, String descripcion, FontAwesomeSolid simbolo) {
+        FontIcon lblSimbolo = new FontIcon(simbolo);
+        lblSimbolo.setIconSize(30);
+        
+        Label lblTitulo = new Label(titulo);
+        lblTitulo.setStyle("-fx-font-size: 15px; -fx-font-weight: bold;");
+
+        Label lblDescripcion = new Label(descripcion);
+        lblDescripcion.setStyle("-fx-font-size: 12px;");
+
+        VBox contenido = new VBox(5, lblSimbolo, lblTitulo, lblDescripcion);
+        contenido.setAlignment(Pos.CENTER);
+
+        Button boton = new Button();
+        boton.setGraphic(contenido);
+        boton.setPrefSize(250, 130);
+
         boton.setStyle("-fx-background-color: white; "
                 + "-fx-border-color: #D5DDE5; "
                 + "-fx-border-radius: 6px; "
                 + "-fx-background-radius: 6px; "
-                + "-fx-font-size: 14px; "
                 + "-fx-cursor: hand;");
+
         return boton;
     }
 

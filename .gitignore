@@ -1,2 +1,3 @@
 /target/
 src/main/java/com/ut3g6/aed_ut3_proyecto/view/design/
+src/main/java/com/ut3g6/aed_ut3_proyecto/model/Conexion.java
