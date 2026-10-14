@@ -84,7 +84,7 @@ public class GeneralTemplateView extends BorderPane {
         contenido.setPadding(new Insets(20));
 
         setTop(cabecera);
-        setLeft(menu)
+        setLeft(menu);
         setCenter(contenido);
         setStyle("-fx-background-color: #F5F7FA;");
 
