@@ -55,7 +55,7 @@ public class GeneralTemplateView extends BorderPane {
         subMenu.setManaged(false);
 
         btnInicio.setOnAction(e ->
-                mostrarContenido(new InicioView()));
+                mostrarContenido(new StartView()));
 
         btnInventario.setOnAction(e -> {
             boolean mostrar = !subMenu.isVisible();
@@ -88,7 +88,7 @@ public class GeneralTemplateView extends BorderPane {
         setCenter(contenido);
         setStyle("-fx-background-color: #F5F7FA;");
 
-        mostrarContenido(new InicioView());
+        mostrarContenido(new StartView());
     }
 
     public void mostrarContenido(Node vista) {
