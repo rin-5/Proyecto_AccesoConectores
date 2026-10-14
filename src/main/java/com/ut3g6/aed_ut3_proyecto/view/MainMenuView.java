@@ -16,9 +16,11 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 public class MainMenuView extends Application {
+    private Stage stage;
 
     @Override
     public void start(Stage stage) {
+        this.stage = stage;
 
         Label titulo = new Label("Gestión de inventario");
         titulo.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
@@ -61,10 +63,10 @@ public class MainMenuView extends Application {
         opciones.add(btnEstantes, 0, 1);
         opciones.add(btnComponentes, 1, 1);
 
-        btnArticulos.setOnAction(e -> mostrarPendiente("Artículos"));
-        btnDepositos.setOnAction(e -> mostrarPendiente("Depósitos"));
-        btnEstantes.setOnAction(e -> mostrarPendiente("Estantes"));
-        btnComponentes.setOnAction(e -> mostrarPendiente("Componentes"));
+        btnArticulos.setOnAction(e -> abrirAplicacion());
+        btnDepositos.setOnAction(e -> abrirAplicacion());
+        btnEstantes.setOnAction(e -> abrirAplicacion());
+        btnComponentes.setOnAction(e -> abrirAplicacion());
 
         Label pie = new Label(
                 "Aplicación de escritorio · Proyecto de acceso a datos");
@@ -122,4 +124,11 @@ public class MainMenuView extends Application {
         alerta.setContentText("Esta vista todavía no está implementada.");
         alerta.showAndWait();
     }
+
+    private void abrirAplicacion() {
+        GeneralTemplateView plantilla = new GeneralTemplateView();
+
+        stage.getScene().setRoot(plantilla);
+    }
+
 }
