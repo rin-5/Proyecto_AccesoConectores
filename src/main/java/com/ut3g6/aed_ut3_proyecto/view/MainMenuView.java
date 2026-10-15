@@ -117,14 +117,6 @@ public class MainMenuView extends Application {
         return boton;
     }
 
-    private void mostrarPendiente(String apartado) {
-        Alert alerta = new Alert(Alert.AlertType.INFORMATION);
-        alerta.setTitle("Apartado pendiente");
-        alerta.setHeaderText(apartado);
-        alerta.setContentText("Esta vista todavía no está implementada.");
-        alerta.showAndWait();
-    }
-
     private void abrirAplicacion() {
         GeneralTemplateView plantilla = new GeneralTemplateView();
 
