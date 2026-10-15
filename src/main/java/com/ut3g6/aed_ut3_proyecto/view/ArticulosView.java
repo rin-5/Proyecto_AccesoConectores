@@ -28,6 +28,7 @@ public class ArticulosView extends VBox {
         filtro.setValue("Todo");
 
         Button btnBuscar = new Button("Buscar");
+        aplicarEstiloBoton(btnBuscar, "#243447");
         HBox zonaFiltros = new HBox(10, filtro, btnBuscar);
         zonaFiltros.setAlignment(Pos.CENTER_LEFT);
 
@@ -138,6 +139,21 @@ public class ArticulosView extends VBox {
         Button btnModificar = new Button("Modificar");
         Button btnEliminar = new Button("Eliminar");
 
+        aplicarEstiloBoton(btnModificar, "#243447");
+        aplicarEstiloBoton(btnEliminar, "#DC2626");
+
+        btnModificar.setOnMouseEntered(e ->
+        aplicarEstiloBoton(btnModificar, "#344A60"));
+
+        btnModificar.setOnMouseExited(e ->
+                aplicarEstiloBoton(btnModificar, "#243447"));
+
+        btnEliminar.setOnMouseEntered(e ->
+                aplicarEstiloBoton(btnEliminar, "#B91C1C"));
+
+        btnEliminar.setOnMouseExited(e ->
+                aplicarEstiloBoton(btnEliminar, "#DC2626"));
+
         HBox zonaAcciones = new HBox(
                 10, seleccionarTodos, btnModificar, btnEliminar);
         zonaAcciones.setAlignment(Pos.CENTER_LEFT);
@@ -145,7 +161,9 @@ public class ArticulosView extends VBox {
         // Paginación visual
         Label lblPagina = new Label("Página 1 de 1");
         Button btnAnterior = new Button("Anterior");
+        // aplicarEstiloBoton(btnAnterior, "#243447");
         Button btnSiguiente = new Button("Siguiente");
+        // aplicarEstiloBoton(btnSiguiente, "#243447");
 
         HBox paginacion = new HBox(
                 10, btnAnterior, lblPagina, btnSiguiente);
@@ -156,6 +174,18 @@ public class ArticulosView extends VBox {
 
         VBox.setVgrow(tabla, javafx.scene.layout.Priority.ALWAYS);
     }
+
+    private void aplicarEstiloBoton(Button boton, String color) {
+        boton.setStyle(
+                "-fx-background-color: " + color + ";"
+                + "-fx-text-fill: white;"
+                + "-fx-background-radius: 6px;"
+                + "-fx-padding: 4 10 4 10;"
+                + "-fx-cursor: hand;"
+                + "-fx-font-size: 13px;"
+        );
+    }
+
 
     public static class ArticuloFila {
 
