@@ -28,7 +28,6 @@ public class ArticulosView extends VBox {
         filtro.setValue("Todo");
 
         Button btnBuscar = new Button("Buscar");
-        aplicarEstiloBoton(btnBuscar, "#243447");
         HBox zonaFiltros = new HBox(10, filtro, btnBuscar);
         zonaFiltros.setAlignment(Pos.CENTER_LEFT);
 
@@ -161,9 +160,7 @@ public class ArticulosView extends VBox {
         // Paginación visual
         Label lblPagina = new Label("Página 1 de 1");
         Button btnAnterior = new Button("Anterior");
-        // aplicarEstiloBoton(btnAnterior, "#243447");
         Button btnSiguiente = new Button("Siguiente");
-        // aplicarEstiloBoton(btnSiguiente, "#243447");
 
         HBox paginacion = new HBox(
                 10, btnAnterior, lblPagina, btnSiguiente);
