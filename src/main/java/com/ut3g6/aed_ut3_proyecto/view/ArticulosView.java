@@ -28,7 +28,10 @@ public class ArticulosView extends VBox {
         filtro.setValue("Todo");
 
         Button btnBuscar = new Button("Buscar");
-        HBox zonaFiltros = new HBox(10, filtro, btnBuscar);
+        Button btnAnadir = new Button("Añadir");
+        aplicarEstiloBoton(btnAnadir, "#243447");
+
+        HBox zonaFiltros = new HBox(10, filtro, btnBuscar, btnAnadir);
         zonaFiltros.setAlignment(Pos.CENTER_LEFT);
 
         // Botones de acción
@@ -186,7 +189,7 @@ public class ArticulosView extends VBox {
                 "-fx-background-color: " + color + ";"
                 + "-fx-text-fill: white;"
                 + "-fx-background-radius: 6px;"
-                + "-fx-padding: 4 10 4 10;"
+                + "-fx-padding: 3 9 3 9;"
                 + "-fx-cursor: hand;"
                 + "-fx-font-size: 13px;"
         );
