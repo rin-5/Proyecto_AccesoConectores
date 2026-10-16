@@ -1,4 +1,3 @@
-
 package com.ut3g6.aed_ut3_proyecto.view;
 
 import javafx.geometry.Insets;
@@ -7,8 +6,8 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.VBox;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 
@@ -23,7 +22,12 @@ public class GeneralTemplateView extends BorderPane {
     private final String colorActivo = "#40566D";
     private final String colorHover = "#344A60";
 
-    //private final Button btnInventario;//
+    private final HBox zonaAcciones = new HBox(10);
+
+    private final Button btnAnadir = new Button("Añadir");
+    private final Button btnModificar = new Button("Modificar");
+    private final Button btnEliminar = new Button("Eliminar");
+    private final Button btnExportar = new Button("Exportar a CSV");
 
     public GeneralTemplateView() {
         // Cabecera del contenido
@@ -83,9 +87,13 @@ public class GeneralTemplateView extends BorderPane {
             subMenu.setManaged(mostrar);
         });
 
-        btnArticulos.setOnAction(e ->
-                mostrarContenido("Gestión de artículos",
-                        new ArticulosView(), btnArticulos));
+        btnArticulos.setOnAction(e -> {
+            ArticulosView vista =
+                new ArticulosView(this::actualizarSeleccion);
+
+            mostrarContenido(
+            "Gestión de artículos", vista, btnArticulos);
+        });
 
         btnDepositos.setOnAction(e ->
                 mostrarContenido("Gestión de depósitos",
@@ -106,9 +114,12 @@ public class GeneralTemplateView extends BorderPane {
         menu.getChildren().addAll(
                 lblLogo, btnInicio, btnInventario, subMenu);
 
+                
         // Zona central
         contenido = new BorderPane();
-        contenido.setTop(cabecera);
+        crearZonaAcciones();
+        VBox zonaSuperior = new VBox(cabecera, zonaAcciones);
+        contenido.setTop(zonaSuperior);
         contenido.setStyle("-fx-background-color: #F5F7FA;");
 
         setLeft(menu);
@@ -119,7 +130,32 @@ public class GeneralTemplateView extends BorderPane {
                 new StartView(), btnInicio);
     }
 
-     private Button crearBoton(
+    private void crearZonaAcciones() {
+        zonaAcciones.setPadding(new Insets(10, 20, 10, 20));
+        zonaAcciones.setAlignment(Pos.CENTER_LEFT);
+
+        aplicarEstiloAccion(btnAnadir, colorBase);
+        aplicarEstiloAccion(btnModificar, colorBase);
+        aplicarEstiloAccion(btnEliminar, "#DC2626");
+        aplicarEstiloAccion(btnExportar, colorBase);
+
+        btnModificar.setVisible(false);
+        btnModificar.setManaged(false);
+
+        btnEliminar.setVisible(false);
+        btnEliminar.setManaged(false);
+
+        btnModificar.setDisable(true);
+        btnEliminar.setDisable(true);
+
+        zonaAcciones.getChildren().addAll(
+                btnAnadir, btnModificar, btnEliminar, btnExportar);
+
+        zonaAcciones.setVisible(false);
+        zonaAcciones.setManaged(false);
+    }
+
+    private Button crearBoton(
             String texto, FontAwesomeSolid simbolo) {
 
         FontIcon icono = new FontIcon(simbolo);
@@ -165,6 +201,8 @@ public class GeneralTemplateView extends BorderPane {
 
         lblTitulo.setText(titulo);
         contenido.setCenter(vista);
+
+        configurarAcciones(vista instanceof ArticulosView);
     }
 
     private void aplicarEstilo(Button boton, String color) {
@@ -176,5 +214,40 @@ public class GeneralTemplateView extends BorderPane {
                 + "-fx-padding: 10 12 10 12; "
                 + "-fx-cursor: hand; "
                 + "-fx-font-size: 14px;");
+    }
+
+    private void aplicarEstiloAccion(Button boton, String color) {
+        boton.setStyle(
+            "-fx-background-color: " + color + ";"
+            + "-fx-text-fill: white;"
+            + "-fx-background-radius: 6px;"
+            + "-fx-padding: 3 9 3 9;"
+            + "-fx-cursor: hand;"
+            + "-fx-font-size: 13px;");
+    }
+
+    private void configurarAcciones(boolean mostrar) {
+        zonaAcciones.setVisible(mostrar);
+        zonaAcciones.setManaged(mostrar);
+
+        btnModificar.setVisible(false);
+        btnModificar.setManaged(false);
+
+        btnEliminar.setVisible(false);
+        btnEliminar.setManaged(false);
+
+        btnModificar.setDisable(true);
+        btnEliminar.setDisable(true);
+    }
+
+    public void actualizarSeleccion(boolean seleccionado) {
+        btnModificar.setVisible(seleccionado);
+        btnModificar.setManaged(seleccionado);
+
+        btnEliminar.setVisible(seleccionado);
+        btnEliminar.setManaged(seleccionado);
+
+        btnModificar.setDisable(!seleccionado);
+        btnEliminar.setDisable(!seleccionado);
     }
 }

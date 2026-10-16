@@ -1,5 +1,7 @@
 package com.ut3g6.aed_ut3_proyecto.view;
 
+import java.util.function.Consumer;
+
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -15,8 +17,11 @@ import javafx.scene.layout.VBox;
 
 public class ArticulosView extends VBox {
 
-    public ArticulosView() {
+    private final Consumer<Boolean> cambioSeleccion;
 
+    public ArticulosView(Consumer<Boolean> cambioSeleccion) {
+        this.cambioSeleccion = cambioSeleccion;
+        
         setAlignment(Pos.TOP_LEFT);
         setSpacing(15);
         setPadding(new Insets(20));
@@ -28,15 +33,9 @@ public class ArticulosView extends VBox {
         filtro.setValue("Todo");
 
         Button btnBuscar = new Button("Buscar");
-        Button btnAnadir = new Button("Añadir");
-        aplicarEstiloBoton(btnAnadir, "#243447");
 
-        HBox zonaFiltros = new HBox(10, filtro, btnBuscar, btnAnadir);
+        HBox zonaFiltros = new HBox(10, filtro, btnBuscar);
         zonaFiltros.setAlignment(Pos.CENTER_LEFT);
-
-        // Botones de acción
-        Button btnModificar = new Button("Modificar");
-        Button btnEliminar = new Button("Eliminar");
 
         // Tabla
         TableView<ArticuloFila> tabla = new TableView<>();
@@ -54,7 +53,9 @@ public class ArticulosView extends VBox {
                             ArticuloFila fila = getTableRow().getItem();
                             if (fila != null) {
                                 fila.setSeleccionado(checkBox.isSelected());
-                                actualizarBotones(tabla, btnModificar, btnEliminar);
+                                cambioSeleccion.accept(
+                                    tabla.getItems().stream()
+                                        .anyMatch(ArticuloFila::isSeleccionado));
                             }
                         });
                     }
@@ -140,33 +141,13 @@ public class ArticulosView extends VBox {
                 articulo.setSeleccionado(seleccionarTodos.isSelected());
             }
             tabla.refresh();
-            actualizarBotones(tabla, btnModificar, btnEliminar);
+            cambioSeleccion.accept(
+                tabla.getItems().stream()
+                    .anyMatch(ArticuloFila::isSeleccionado));
         });
 
-        // "Estilo" botones de acciones
-        btnModificar.setVisible(false);
-        btnModificar.setManaged(false);
-
-        btnEliminar.setVisible(false);
-        btnEliminar.setManaged(false);
-
-        aplicarEstiloBoton(btnModificar, "#243447");
-        aplicarEstiloBoton(btnEliminar, "#DC2626");
-
-        btnModificar.setOnMouseEntered(e ->
-        aplicarEstiloBoton(btnModificar, "#344A60"));
-
-        btnModificar.setOnMouseExited(e ->
-                aplicarEstiloBoton(btnModificar, "#243447"));
-
-        btnEliminar.setOnMouseEntered(e ->
-                aplicarEstiloBoton(btnEliminar, "#B91C1C"));
-
-        btnEliminar.setOnMouseExited(e ->
-                aplicarEstiloBoton(btnEliminar, "#DC2626"));
-
         HBox zonaAcciones = new HBox(
-                10, seleccionarTodos, btnModificar, btnEliminar);
+                10, seleccionarTodos);
         zonaAcciones.setAlignment(Pos.CENTER_LEFT);
 
         // Paginación visual
@@ -182,17 +163,6 @@ public class ArticulosView extends VBox {
                 zonaFiltros, tabla, zonaAcciones, paginacion);
 
         VBox.setVgrow(tabla, javafx.scene.layout.Priority.ALWAYS);
-    }
-
-    private void aplicarEstiloBoton(Button boton, String color) {
-        boton.setStyle(
-                "-fx-background-color: " + color + ";"
-                + "-fx-text-fill: white;"
-                + "-fx-background-radius: 6px;"
-                + "-fx-padding: 3 9 3 9;"
-                + "-fx-cursor: hand;"
-                + "-fx-font-size: 13px;"
-        );
     }
 
 
@@ -235,18 +205,4 @@ public class ArticulosView extends VBox {
             this.seleccionado = seleccionado;
         }
     }
-
-    private void actualizarBotones(TableView<ArticuloFila> tabla,
-                               Button btnModificar,
-                               Button btnEliminar) {
-
-            boolean seleccionado = tabla.getItems().stream()
-                .anyMatch(ArticuloFila::isSeleccionado);
-
-            btnModificar.setVisible(seleccionado);
-            btnModificar.setManaged(seleccionado);
-
-            btnEliminar.setVisible(seleccionado);
-            btnEliminar.setManaged(seleccionado);
-        }
 }
