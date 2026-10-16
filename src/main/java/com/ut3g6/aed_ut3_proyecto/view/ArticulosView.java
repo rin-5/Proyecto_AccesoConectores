@@ -31,6 +31,10 @@ public class ArticulosView extends VBox {
         HBox zonaFiltros = new HBox(10, filtro, btnBuscar);
         zonaFiltros.setAlignment(Pos.CENTER_LEFT);
 
+        // Botones de acción
+        Button btnModificar = new Button("Modificar");
+        Button btnEliminar = new Button("Eliminar");
+
         // Tabla
         TableView<ArticuloFila> tabla = new TableView<>();
 
@@ -47,6 +51,7 @@ public class ArticulosView extends VBox {
                             ArticuloFila fila = getTableRow().getItem();
                             if (fila != null) {
                                 fila.setSeleccionado(checkBox.isSelected());
+                                actualizarBotones(tabla, btnModificar, btnEliminar);
                             }
                         });
                     }
@@ -132,11 +137,15 @@ public class ArticulosView extends VBox {
                 articulo.setSeleccionado(seleccionarTodos.isSelected());
             }
             tabla.refresh();
+            actualizarBotones(tabla, btnModificar, btnEliminar);
         });
 
-        // Botones de acciones
-        Button btnModificar = new Button("Modificar");
-        Button btnEliminar = new Button("Eliminar");
+        // "Estilo" botones de acciones
+        btnModificar.setVisible(false);
+        btnModificar.setManaged(false);
+
+        btnEliminar.setVisible(false);
+        btnEliminar.setManaged(false);
 
         aplicarEstiloBoton(btnModificar, "#243447");
         aplicarEstiloBoton(btnEliminar, "#DC2626");
@@ -223,4 +232,18 @@ public class ArticulosView extends VBox {
             this.seleccionado = seleccionado;
         }
     }
+
+    private void actualizarBotones(TableView<ArticuloFila> tabla,
+                               Button btnModificar,
+                               Button btnEliminar) {
+
+            boolean seleccionado = tabla.getItems().stream()
+                .anyMatch(ArticuloFila::isSeleccionado);
+
+            btnModificar.setVisible(seleccionado);
+            btnModificar.setManaged(seleccionado);
+
+            btnEliminar.setVisible(seleccionado);
+            btnEliminar.setManaged(seleccionado);
+        }
 }
