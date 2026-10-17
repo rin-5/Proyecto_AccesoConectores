@@ -21,6 +21,7 @@ public class MainMenuView extends Application {
     public void start(Stage stage) {
         this.stage = stage;
 
+        // Cabecera
         Label titulo = new Label("Gestión de inventario");
         titulo.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
 
@@ -33,6 +34,8 @@ public class MainMenuView extends Application {
         cabecera.setPadding(new Insets(25));
         cabecera.setStyle("-fx-background-color: #243447; "
                 + "-fx-text-fill: white;");
+
+        // Titulo e instrucciones
         titulo.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; "
                 + "-fx-text-fill: white;");
         subtitulo.setStyle("-fx-font-size: 14px; -fx-text-fill: white;");
@@ -43,6 +46,7 @@ public class MainMenuView extends Application {
         Label instrucciones = new Label(
                 "Selecciona el apartado que deseas gestionar.");
 
+        // Tarjetas de acceso
         GridPane opciones = new GridPane();
         opciones.setAlignment(Pos.CENTER);
         opciones.setHgap(20);
@@ -62,25 +66,39 @@ public class MainMenuView extends Application {
         opciones.add(btnEstantes, 0, 1);
         opciones.add(btnComponentes, 1, 1);
 
-        btnArticulos.setOnAction(e -> abrirAplicacion());
-        btnDepositos.setOnAction(e -> abrirAplicacion());
-        btnEstantes.setOnAction(e -> abrirAplicacion());
-        btnComponentes.setOnAction(e -> abrirAplicacion());
+        // Navegacion
+        btnArticulos.setOnAction(e -> abrirAplicacion("Artículos"));
+        btnDepositos.setOnAction(e -> abrirAplicacion("Depósitos"));
+        btnEstantes.setOnAction(e -> abrirAplicacion("Estantes"));
+        btnComponentes.setOnAction(e -> abrirAplicacion("Componentes"));
 
+        // Acceso secundario al inicio
+        Button btnInicio = new Button("Ir al inicio");
+        btnInicio.setStyle(
+                "-fx-background-color: transparent; "
+                + "-fx-text-fill: #64748B; "
+                + "-fx-font-size: 12px; "
+                + "-fx-cursor: hand;");
+
+        btnInicio.setOnAction(e -> abrirAplicacion(null));
+
+        
+        // Contenido central
+        VBox contenido = new VBox(15,
+            textoMenu, instrucciones, opciones, btnInicio);
+            contenido.setAlignment(Pos.CENTER);
+            contenido.setPadding(new Insets(25));
+            
+        // Pie de pagina
         Label pie = new Label(
                 "Aplicación de escritorio · Proyecto de acceso a datos");
         pie.setStyle("-fx-text-fill: #666666; -fx-font-size: 11px;");
-
-        VBox contenido = new VBox(15,
-                textoMenu, instrucciones, opciones);
-        contenido.setAlignment(Pos.CENTER);
-        contenido.setPadding(new Insets(25));
-
         VBox raiz = new VBox(cabecera, contenido, pie);
         raiz.setAlignment(Pos.TOP_CENTER);
         raiz.setStyle("-fx-background-color: #F5F7FA;");
         VBox.setMargin(pie, new Insets(10, 10, 20, 10));
 
+        // Escena
         Scene escena = new Scene(raiz, 750, 600);
 
         stage.setTitle("Gestión de inventario");
@@ -116,8 +134,12 @@ public class MainMenuView extends Application {
         return boton;
     }
 
-    private void abrirAplicacion() {
+    private void abrirAplicacion(String gestion) {
         GeneralTemplateView plantilla = new GeneralTemplateView();
+
+        if (gestion != null) {
+            plantilla.abrirGestion(gestion);
+        }
 
         stage.getScene().setRoot(plantilla);
     }

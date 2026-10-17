@@ -19,6 +19,11 @@ public class GeneralTemplateView extends BorderPane {
     private final Label lblTitulo;
     private Button botonActivo;
 
+    private Button btnArticulos;
+    private Button btnDepositos;
+    private Button btnEstantes;
+    private Button btnComponentes;
+
     private final String colorBase = "#243447";
     private final String colorActivo = "#40566D";
     private final String colorHover = "#344A60";
@@ -59,17 +64,17 @@ public class GeneralTemplateView extends BorderPane {
         subMenu = new VBox(5);
         subMenu.setPadding(new Insets(0, 0, 0, 15));
 
-        Button btnArticulos = crearBoton(
-                "Artículos", FontAwesomeSolid.BOX);
+        btnArticulos = crearBoton(
+            "Artículos", FontAwesomeSolid.BOX);
 
-        Button btnDepositos = crearBoton(
-                "Depósitos", FontAwesomeSolid.WAREHOUSE);
+        btnDepositos = crearBoton(
+            "Depósitos", FontAwesomeSolid.WAREHOUSE);
 
-        Button btnEstantes = crearBoton(
-                "Estantes", FontAwesomeSolid.TH_LARGE);
+        btnEstantes = crearBoton(
+            "Estantes", FontAwesomeSolid.TH_LARGE);
 
-        Button btnComponentes = crearBoton(
-                "Componentes", FontAwesomeSolid.COG);
+        btnComponentes = crearBoton(
+            "Componentes", FontAwesomeSolid.COG);
 
         subMenu.getChildren().addAll(
                 btnArticulos, btnDepositos,
@@ -80,7 +85,7 @@ public class GeneralTemplateView extends BorderPane {
 
         btnInicio.setOnAction(e ->
                 mostrarContenido("Panel de control",
-                        new StartView(), btnInicio));
+                        new StartView(this::abrirGestion), btnInicio));
 
         btnInventario.setOnAction(e -> {
             boolean mostrar = !subMenu.isVisible();
@@ -140,7 +145,39 @@ public class GeneralTemplateView extends BorderPane {
         setStyle("-fx-background-color: #F5F7FA;");
 
         mostrarContenido("Panel de control",
-                new StartView(), btnInicio);
+                new StartView(this::abrirGestion), btnInicio);
+    }
+
+    public void abrirGestion(String gestion) {
+        switch (gestion) {
+            case "Artículos":
+                mostrarContenido(
+                        "Gestión de artículos",
+                        new ArticulosView(this::actualizarSeleccion),
+                        btnArticulos);
+                break;
+
+            case "Depósitos":
+                mostrarContenido(
+                        "Gestión de depósitos",
+                        new DepositosView(this::actualizarSeleccion),
+                        btnDepositos);
+                break;
+
+            case "Estantes":
+                mostrarContenido(
+                        "Gestión de estantes",
+                        new EstantesView(this::actualizarSeleccion),
+                        btnEstantes);
+                break;
+
+            case "Componentes":
+                mostrarContenido(
+                        "Gestión de componentes",
+                        new ComponentesView(this::actualizarSeleccion),
+                        btnComponentes);
+                break;
+        }
     }
 
     private void crearZonaAcciones() {
