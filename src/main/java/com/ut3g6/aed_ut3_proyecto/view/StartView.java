@@ -2,17 +2,21 @@ package com.ut3g6.aed_ut3_proyecto.view;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
-public class StartView extends VBox {
+public class StartView extends ScrollPane  {
+
+    private final VBox contenido = new VBox();
 
     private final String colorBase = "#243447";
     private final String colorFondo = "#FFFFFF";
@@ -23,12 +27,27 @@ public class StartView extends VBox {
     private final List<VBox> listaTarjetas = new ArrayList<>();
     private final List<Button> listaAccesos = new ArrayList<>();
 
+    private final Consumer<String> navegar;
+
     private static final double ANCHO_MINIMO = 1000;
 
-    public StartView() {
-        setSpacing(25);
-        setPadding(new Insets(20));
-        setAlignment(Pos.TOP_LEFT);
+    public StartView(Consumer<String> navegar) {
+        this.navegar = navegar;
+
+        contenido.setSpacing(25);
+        contenido.setPadding(new Insets(20));
+        contenido.setAlignment(Pos.TOP_LEFT);
+
+        setContent(contenido);
+        setFitToWidth(true);
+        setFitToHeight(false);
+
+        setHbarPolicy(ScrollBarPolicy.NEVER);
+        setVbarPolicy(ScrollBarPolicy.AS_NEEDED);
+
+        setStyle(
+                "-fx-background-color: #F5F7FA; "
+                + "-fx-background: #F5F7FA;");
 
         // Tarjetas de información
         listaTarjetas.add(crearTarjeta(
@@ -47,12 +66,12 @@ public class StartView extends VBox {
                 + "-fx-font-weight: bold; "
                 + "-fx-text-fill: " + colorBase + ";");
 
-        listaAccesos.add(crearAcceso("Gestionar artículos"));
-        listaAccesos.add(crearAcceso("Gestionar depósitos"));
-        listaAccesos.add(crearAcceso("Gestionar estantes"));
-        listaAccesos.add(crearAcceso("Gestionar componentes"));
+        listaAccesos.add(crearAcceso("Gestionar artículos", "Artículos"));
+        listaAccesos.add(crearAcceso("Gestionar depósitos", "Depósitos"));
+        listaAccesos.add(crearAcceso("Gestionar estantes", "Estantes"));
+        listaAccesos.add(crearAcceso("Gestionar componentes", "Componentes"));
 
-        getChildren().addAll(tarjetas, lblAccesos, accesos);
+        contenido.getChildren().addAll(tarjetas, lblAccesos, accesos);
 
         // Adapta la distribución al ancho disponible.
         widthProperty().addListener((obs, anterior, actual) ->
@@ -121,7 +140,7 @@ public class StartView extends VBox {
         return tarjeta;
     }
 
-    private Button crearAcceso(String texto) {
+    private Button crearAcceso(String texto, String gestion) {
         Button boton = new Button(texto);
         boton.setMaxWidth(Double.MAX_VALUE);
         boton.setMinHeight(65);
@@ -134,6 +153,8 @@ public class StartView extends VBox {
                 + "-fx-border-color: #E2E8F0; "
                 + "-fx-border-radius: 8px; "
                 + "-fx-cursor: hand;");
+
+        boton.setOnAction(e -> navegar.accept(gestion));
 
         return boton;
     }
