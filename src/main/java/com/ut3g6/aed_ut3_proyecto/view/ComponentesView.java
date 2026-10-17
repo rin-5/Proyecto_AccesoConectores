@@ -1,10 +1,17 @@
 package com.ut3g6.aed_ut3_proyecto.view;
 
+import java.sql.SQLException;
+import java.util.List;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
+
+import com.ut3g6.aed_ut3_proyecto.controller.ConsultasAdicionalesDAO;
+import com.ut3g6.aed_ut3_proyecto.controller.ConsultasAdicionalesDAO.ComponenteInventario;
 
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
@@ -21,6 +28,11 @@ public class ComponentesView extends VBox {
 
     private final Consumer<Boolean> cambioSeleccion;
 
+    private final TableView<ComponenteFila> tabla = new TableView<>();
+    private final ComboBox<String> filtro = new ComboBox<>();
+    private final ConsultasAdicionalesDAO consultas =
+            new ConsultasAdicionalesDAO();
+
     public ComponentesView(Consumer<Boolean> cambioSeleccion) {
         this.cambioSeleccion = cambioSeleccion;
 
@@ -29,7 +41,6 @@ public class ComponentesView extends VBox {
         setPadding(new Insets(20));
 
         // Filtros
-        ComboBox<String> filtro = new ComboBox<>();
         filtro.getItems().addAll(
                 "Todo", "Con subcomponentes", "Sin subcomponentes");
         filtro.setValue("Todo");
@@ -40,8 +51,6 @@ public class ComponentesView extends VBox {
         zonaFiltros.setAlignment(Pos.CENTER_LEFT);
 
         // Tabla
-        TableView<ComponenteFila> tabla = new TableView<>();
-
         TableColumn<ComponenteFila, Boolean> colSeleccion =
                 new TableColumn<>("");
 
@@ -110,15 +119,8 @@ public class ComponentesView extends VBox {
         tabla.setColumnResizePolicy(
                 TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
 
-        // Datos provisionales
-        tabla.setItems(FXCollections.observableArrayList(
-                new ComponenteFila(
-                        1, "Motor eléctrico", 5, "Rotor, carcasa"),
-                new ComponenteFila(
-                        2, "Sistema de transmisión", 10, "Engranajes"),
-                new ComponenteFila(
-                        3, "Tornillo", 250, "Ninguno")
-        ));
+        cargarComponentes();
+        btnBuscar.setOnAction(e -> aplicarFiltro());
 
         // Seleccionar todos
         CheckBox seleccionarTodos =
@@ -158,22 +160,24 @@ public class ComponentesView extends VBox {
 
     public static class ComponenteFila {
 
-        private final int id;
+        private final String id;
         private final String descripcion;
         private final int cantidad;
         private final String subcomponentes;
+        private final boolean tieneSubcomponentes;
         private boolean seleccionado;
 
-        public ComponenteFila(int id, String descripcion,
-                              int cantidad, String subcomponentes) {
+        public ComponenteFila(String id, String descripcion,
+                              int cantidad, String subcomponentes, boolean tieneSubcomponentes) {
             this.id = id;
             this.descripcion = descripcion;
             this.cantidad = cantidad;
             this.subcomponentes = subcomponentes;
+            this.tieneSubcomponentes = tieneSubcomponentes;
             this.seleccionado = false;
         }
 
-        public int getId() {
+        public String getId() {
             return id;
         }
 
@@ -189,12 +193,91 @@ public class ComponentesView extends VBox {
             return subcomponentes;
         }
 
+        public boolean isTieneSubcomponentes() {
+            return tieneSubcomponentes;
+        }
+
         public boolean isSeleccionado() {
             return seleccionado;
         }
 
         public void setSeleccionado(boolean seleccionado) {
             this.seleccionado = seleccionado;
+        }
+    }
+
+    private void cargarComponentes() {
+        try {
+            List<ComponenteInventario> componentes =
+                    consultas.listarComponentesInventario();
+
+            tabla.setItems(FXCollections.observableArrayList(
+                    componentes.stream()
+                            .map(c -> new ComponenteFila(
+                                    c.getId(),
+                                    c.getDescripcion(),
+                                    c.getCantidad(),
+                                    c.getSubcomponentes(),
+                                    c.isTieneSubcomponentes()))
+                            .collect(Collectors.toList())
+            ));
+
+            aplicarFiltro();
+
+        } catch (SQLException ex) {
+            Alert alerta = new Alert(Alert.AlertType.ERROR);
+            alerta.setTitle("Error de base de datos");
+            alerta.setHeaderText(
+                    "No se han podido cargar los componentes");
+            alerta.setContentText(ex.getMessage());
+            alerta.showAndWait();
+        }
+    }
+
+    private void aplicarFiltro() {
+        try {
+            List<ComponenteInventario> componentes =
+                    consultas.listarComponentesInventario();
+
+            String opcionSeleccionada = filtro.getValue();
+
+            List<ComponenteFila> filas = componentes.stream()
+                    .filter(c -> {
+                        if (opcionSeleccionada == null
+                                || opcionSeleccionada.equals("Todo")) {
+                            return true;
+                        }
+
+                        if (opcionSeleccionada.equals(
+                                "Con subcomponentes")) {
+                            return c.isTieneSubcomponentes();
+                        }
+
+                        if (opcionSeleccionada.equals(
+                                "Sin subcomponentes")) {
+                            return !c.isTieneSubcomponentes();
+                        }
+
+                        return true;
+                    })
+                    .map(c -> new ComponenteFila(
+                            c.getId(),
+                            c.getDescripcion(),
+                            c.getCantidad(),
+                            c.getSubcomponentes(),
+                            c.isTieneSubcomponentes()))
+                    .collect(Collectors.toList());
+
+            tabla.setItems(
+                    FXCollections.observableArrayList(filas));
+
+        } catch (SQLException ex) {
+            Alert alerta = new Alert(Alert.AlertType.ERROR);
+            alerta.setTitle("Error de base de datos");
+            alerta.setHeaderText(
+                    "No se ha podido aplicar el filtro");
+            alerta.setContentText(ex.getMessage());
+            alerta.showAndWait();
         }
     }
 }

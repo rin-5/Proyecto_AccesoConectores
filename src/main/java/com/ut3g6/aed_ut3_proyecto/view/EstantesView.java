@@ -1,10 +1,17 @@
 package com.ut3g6.aed_ut3_proyecto.view;
 
+import java.sql.SQLException;
+import java.util.List;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
+
+import com.ut3g6.aed_ut3_proyecto.controller.ConsultasAdicionalesDAO;
+import com.ut3g6.aed_ut3_proyecto.controller.ConsultasAdicionalesDAO.EstanteInventario;
 
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
@@ -21,6 +28,13 @@ public class EstantesView extends VBox {
 
     private final Consumer<Boolean> cambioSeleccion;
 
+    private final ConsultasAdicionalesDAO consultas =
+        new ConsultasAdicionalesDAO();
+
+    private final TableView<EstanteFila> tabla = new TableView<>();
+    private final ComboBox<String> filtro = new ComboBox<>();
+    private List<EstanteInventario> datos = List.of();
+
     public EstantesView(Consumer<Boolean> cambioSeleccion) {
         this.cambioSeleccion = cambioSeleccion;
 
@@ -29,7 +43,6 @@ public class EstantesView extends VBox {
         setPadding(new Insets(20));
 
         // Filtros
-        ComboBox<String> filtro = new ComboBox<>();
         filtro.getItems().addAll(
                 "Todo", "Depósito principal", "Depósito secundario");
         filtro.setValue("Todo");
@@ -40,8 +53,6 @@ public class EstantesView extends VBox {
         zonaFiltros.setAlignment(Pos.CENTER_LEFT);
 
         // Tabla
-        TableView<EstanteFila> tabla = new TableView<>();
-
         TableColumn<EstanteFila, Boolean> colSeleccion =
                 new TableColumn<>("");
 
@@ -83,7 +94,7 @@ public class EstantesView extends VBox {
 
         colSeleccion.setPrefWidth(45);
 
-        TableColumn<EstanteFila, Integer> colId =
+        TableColumn<EstanteFila, String> colId =
                 new TableColumn<>("ID");
         colId.setCellValueFactory(
                 new PropertyValueFactory<>("id"));
@@ -104,12 +115,9 @@ public class EstantesView extends VBox {
         tabla.setColumnResizePolicy(
                 TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
 
-        // Datos provisionales
-        tabla.setItems(FXCollections.observableArrayList(
-                new EstanteFila(1, "Estante E-01", "Depósito principal"),
-                new EstanteFila(2, "Estante E-02", "Depósito principal"),
-                new EstanteFila(3, "Estante E-03", "Depósito secundario")
-        ));
+        // carga de datos
+        cargarEstantes();
+        btnBuscar.setOnAction(e -> aplicarFiltro());
 
         // Seleccionar todos
         CheckBox seleccionarTodos =
@@ -148,19 +156,19 @@ public class EstantesView extends VBox {
 
     public static class EstanteFila {
 
-        private final int id;
+        private final String id;
         private final String nombre;
         private final String deposito;
         private boolean seleccionado;
 
-        public EstanteFila(int id, String nombre, String deposito) {
+        public EstanteFila(String id, String nombre, String deposito) {
             this.id = id;
             this.nombre = nombre;
             this.deposito = deposito;
             this.seleccionado = false;
         }
 
-        public int getId() {
+        public String getId() {
             return id;
         }
 
@@ -180,4 +188,52 @@ public class EstantesView extends VBox {
             this.seleccionado = seleccionado;
         }
     }
+
+    
+    private void cargarEstantes() {
+        try {
+            datos = consultas.listarEstantes();
+
+            filtro.getItems().clear();
+            filtro.getItems().add("Todo");
+
+            datos.stream()
+                .map(EstanteInventario::getDeposito)
+                .filter(nombre -> !nombre.equals("-"))
+                .distinct()
+                .sorted()
+                .forEach(filtro.getItems()::add);
+
+            filtro.setValue("Todo");
+            aplicarFiltro();
+
+        } catch (SQLException ex) {
+            mostrarError("No se han podido cargar los estantes", ex);
+        }
+    }
+
+    private void aplicarFiltro() {
+        String seleccion = filtro.getValue();
+
+        List<EstanteFila> filas = datos.stream()
+            .filter(e -> seleccion == null
+                    || seleccion.equals("Todo")
+                    || seleccion.equals(e.getDeposito()))
+            .map(e -> new EstanteFila(
+                    e.getId(),
+                    e.getNombre(),
+                    e.getDeposito()))
+            .collect(Collectors.toList());
+
+        tabla.setItems(FXCollections.observableArrayList(filas));
+    }
+
+    private void mostrarError(String mensaje, SQLException ex) {
+        Alert alerta = new Alert(Alert.AlertType.ERROR);
+        alerta.setTitle("Error de base de datos");
+        alerta.setHeaderText(mensaje);
+        alerta.setContentText(ex.getMessage());
+        alerta.showAndWait();
+    }
+
 }

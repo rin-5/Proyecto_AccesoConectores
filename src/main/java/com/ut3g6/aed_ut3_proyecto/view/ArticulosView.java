@@ -1,10 +1,19 @@
 package com.ut3g6.aed_ut3_proyecto.view;
 
+import java.sql.SQLException;
+import java.util.List;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
+
+import com.ut3g6.aed_ut3_proyecto.controller.ConsultasAdicionalesDAO;
+import com.ut3g6.aed_ut3_proyecto.controller.ConsultasAdicionalesDAO.ArticuloInventario;
+import com.ut3g6.aed_ut3_proyecto.view.ArticulosView.ArticuloFila;
+import com.ut3g6.aed_ut3_proyecto.view.ComponentesView.ComponenteFila;
 
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
@@ -21,6 +30,11 @@ public class ArticulosView extends VBox {
 
     private final Consumer<Boolean> cambioSeleccion;
 
+    private final TableView<ArticuloFila> tabla = new TableView<>();
+    private final ComboBox<String> filtro = new ComboBox<>();
+    private final ConsultasAdicionalesDAO consultas =
+            new ConsultasAdicionalesDAO();
+
     public ArticulosView(Consumer<Boolean> cambioSeleccion) {
         this.cambioSeleccion = cambioSeleccion;
         
@@ -29,7 +43,6 @@ public class ArticulosView extends VBox {
         setPadding(new Insets(20));
 
         // Filtros
-        ComboBox<String> filtro = new ComboBox<>();
         filtro.getItems().addAll(
                 "Todo", "En stock", "Ordenar pronto", "Sin/Bajo stock");
         filtro.setValue("Todo");
@@ -40,8 +53,6 @@ public class ArticulosView extends VBox {
         zonaFiltros.setAlignment(Pos.CENTER_LEFT);
 
         // Tabla
-        TableView<ArticuloFila> tabla = new TableView<>();
-
         TableColumn<ArticuloFila, Boolean> colSeleccion =
                 new TableColumn<>("");
 
@@ -128,15 +139,11 @@ public class ArticulosView extends VBox {
         tabla.setColumnResizePolicy(
                 TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
 
-        // Datos provisionales
-        tabla.setItems(FXCollections.observableArrayList(
-                new ArticuloFila(1, "Tornillo", 0.15,
-                        "TOR001", 250, "E-01", "D-01", "En stock"),
-                new ArticuloFila(2, "Tuerca", 0.10,
-                        "TUE001", 80, "E-02", "D-01", "En stock"),
-                new ArticuloFila(3, "Motor", 45.50,
-                        "MOT001", 5, "E-03", "D-02", "Bajo stock")
-        ));
+        // Carga inicial desde la base de datos
+        cargarArticulos();
+
+        // Aplicar el filtro seleccionado
+        btnBuscar.setOnAction(e -> aplicarFiltro());
 
         // Seleccionar todos
         CheckBox seleccionarTodos = new CheckBox("Seleccionar todo");
@@ -172,7 +179,7 @@ public class ArticulosView extends VBox {
 
     public static class ArticuloFila {
 
-        private final int id;
+        private final String id;
         private final String nombre;
         private final double precio;
         private final String codigo;
@@ -182,7 +189,7 @@ public class ArticulosView extends VBox {
         private final String estado;
         private boolean seleccionado;
 
-        public ArticuloFila(int id, String nombre, double precio,
+        public ArticuloFila(String id, String nombre, double precio,
                             String codigo, int cantidad, String estante,
                             String deposito, String estado) {
             this.id = id;
@@ -196,7 +203,7 @@ public class ArticulosView extends VBox {
             this.seleccionado = false;
         }
 
-        public int getId() { return id; }
+        public String getId() { return id; }
         public String getNombre() { return nombre; }
         public double getPrecio() { return precio; }
         public String getCodigo() { return codigo; }
@@ -209,4 +216,89 @@ public class ArticulosView extends VBox {
             this.seleccionado = seleccionado;
         }
     }
+
+    
+    private void cargarArticulos() {
+        try {
+            List<ArticuloInventario> articulos =
+                    consultas.listarArticulos();
+
+            tabla.setItems(FXCollections.observableArrayList(
+                articulos.stream()
+                    .map(a -> new ArticuloFila(
+                        a.getId(),
+                        a.getNombre(),
+                        a.getPrecio(),
+                        a.getCodigo(),
+                        a.getCantidad(),
+                        a.getEstante(),
+                        a.getDeposito(),
+                        a.getEstado()
+                    ))
+                    .collect(Collectors.toList())
+            ));
+
+            aplicarFiltro();
+
+        } catch (SQLException ex) {
+            Alert alerta = new Alert(Alert.AlertType.ERROR);
+            alerta.setTitle("Error de base de datos");
+            alerta.setHeaderText("No se han podido cargar los artículos");
+            alerta.setContentText(ex.getMessage());
+            alerta.showAndWait();
+        }
+    }
+
+    private void aplicarFiltro() {
+        try {
+            List<ArticuloInventario> articulos =
+                    consultas.listarArticulos();
+
+            String estadoSeleccionado = filtro.getValue();
+
+            List<ArticuloFila> filas = articulos.stream()
+                .filter(a -> {
+                    if (estadoSeleccionado == null
+                            || estadoSeleccionado.equals("Todo")) {
+                        return true;
+                    }
+
+                    if (estadoSeleccionado.equals("En stock")) {
+                        return a.getEstado().equals("En stock");
+                    }
+
+                    if (estadoSeleccionado.equals("Ordenar pronto")) {
+                        return a.getEstado().equals("Bajo stock");
+                    }
+
+                    if (estadoSeleccionado.equals("Sin/Bajo stock")) {
+                        return a.getEstado().equals("Sin stock")
+                                || a.getEstado().equals("Bajo stock");
+                    }
+
+                    return true;
+                })
+                .map(a -> new ArticuloFila(
+                    a.getId(),
+                    a.getNombre(),
+                    a.getPrecio(),
+                    a.getCodigo(),
+                    a.getCantidad(),
+                    a.getEstante(),
+                    a.getDeposito(),
+                    a.getEstado()
+                ))
+                .collect(Collectors.toList());
+
+            tabla.setItems(FXCollections.observableArrayList(filas));
+
+        } catch (SQLException ex) {
+            Alert alerta = new Alert(Alert.AlertType.ERROR);
+            alerta.setTitle("Error de base de datos");
+            alerta.setHeaderText("No se ha podido aplicar el filtro");
+            alerta.setContentText(ex.getMessage());
+            alerta.showAndWait();
+        }
+    }
+
 }

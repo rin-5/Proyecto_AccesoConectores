@@ -1,10 +1,17 @@
 package com.ut3g6.aed_ut3_proyecto.view;
 
+import java.sql.SQLException;
+import java.util.List;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
+
+import com.ut3g6.aed_ut3_proyecto.controller.ConsultasAdicionalesDAO;
+import com.ut3g6.aed_ut3_proyecto.controller.ConsultasAdicionalesDAO.DepositoInventario;
 
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
@@ -21,6 +28,13 @@ public class DepositosView extends VBox {
 
     private final Consumer<Boolean> cambioSeleccion;
 
+    private final ConsultasAdicionalesDAO consultas =
+            new ConsultasAdicionalesDAO();
+
+    private final TableView<DepositoFila> tabla = new TableView<>();
+    private final ComboBox<String> filtro = new ComboBox<>();
+    private List<DepositoInventario> datos = List.of();
+
     public DepositosView(Consumer<Boolean> cambioSeleccion) {
         this.cambioSeleccion = cambioSeleccion;
 
@@ -29,7 +43,6 @@ public class DepositosView extends VBox {
         setPadding(new Insets(20));
 
         // Filtros
-        ComboBox<String> filtro = new ComboBox<>();
         filtro.getItems().addAll("Todo", "Con estantes", "Sin estantes");
         filtro.setValue("Todo");
 
@@ -39,8 +52,6 @@ public class DepositosView extends VBox {
         zonaFiltros.setAlignment(Pos.CENTER_LEFT);
 
         // Tabla
-        TableView<DepositoFila> tabla = new TableView<>();
-
         TableColumn<DepositoFila, Boolean> colSeleccion =
                 new TableColumn<>("");
 
@@ -109,15 +120,8 @@ public class DepositosView extends VBox {
         tabla.setColumnResizePolicy(
                 TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
 
-        // Datos provisionales
-        tabla.setItems(FXCollections.observableArrayList(
-                new DepositoFila(
-                        1, "Depósito principal", "Calle Mayor 10", 12),
-                new DepositoFila(
-                        2, "Depósito secundario", "Calle Norte 25", 6),
-                new DepositoFila(
-                        3, "Depósito auxiliar", "Avenida Central 8", 0)
-        ));
+        cargarDepositos();
+        btnBuscar.setOnAction(e -> aplicarFiltro());
 
         // Seleccionar todos
         CheckBox seleccionarTodos =
@@ -195,4 +199,58 @@ public class DepositosView extends VBox {
             this.seleccionado = seleccionado;
         }
     }
+
+    
+    private void cargarDepositos() {
+        try {
+            datos = consultas.listarDepositos();
+
+            filtro.getItems().setAll(
+                    "Todo", "Con estantes", "Sin estantes");
+            filtro.setValue("Todo");
+
+            aplicarFiltro();
+
+        } catch (SQLException ex) {
+            mostrarError("No se han podido cargar los depósitos", ex);
+        }
+    }
+
+    private void aplicarFiltro() {
+        String seleccion = filtro.getValue();
+
+        List<DepositoFila> filas = datos.stream()
+            .filter(d -> {
+                if (seleccion == null || seleccion.equals("Todo")) {
+                    return true;
+                }
+
+                if (seleccion.equals("Con estantes")) {
+                    return d.getEstantes() > 0;
+                }
+
+                if (seleccion.equals("Sin estantes")) {
+                    return d.getEstantes() == 0;
+                }
+
+                return true;
+            })
+            .map(d -> new DepositoFila(
+                    d.getId(),
+                    d.getDescripcion(),
+                    d.getDireccion(),
+                    d.getEstantes()))
+            .collect(Collectors.toList());
+
+        tabla.setItems(FXCollections.observableArrayList(filas));
+    }
+
+    private void mostrarError(String mensaje, SQLException ex) {
+        Alert alerta = new Alert(Alert.AlertType.ERROR);
+        alerta.setTitle("Error de base de datos");
+        alerta.setHeaderText(mensaje);
+        alerta.setContentText(ex.getMessage());
+        alerta.showAndWait();
+    }
+
 }
