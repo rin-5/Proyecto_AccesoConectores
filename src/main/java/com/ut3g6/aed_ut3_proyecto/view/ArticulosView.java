@@ -9,10 +9,12 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
 public class ArticulosView extends VBox {
@@ -42,38 +44,40 @@ public class ArticulosView extends VBox {
 
         TableColumn<ArticuloFila, Boolean> colSeleccion =
                 new TableColumn<>("");
+
         colSeleccion.setCellValueFactory(
                 new PropertyValueFactory<>("seleccionado"));
-        colSeleccion.setCellFactory(col ->
-                new javafx.scene.control.TableCell<>() {
-                    private final CheckBox checkBox = new CheckBox();
 
-                    {
-                        checkBox.setOnAction(e -> {
-                            ArticuloFila fila = getTableRow().getItem();
-                            if (fila != null) {
-                                fila.setSeleccionado(checkBox.isSelected());
-                                cambioSeleccion.accept(
-                                    tabla.getItems().stream()
-                                        .anyMatch(ArticuloFila::isSeleccionado));
-                            }
-                        });
-                    }
+        colSeleccion.setCellFactory(col -> new TableCell<>() {
+            private final CheckBox checkBox = new CheckBox();
 
-                    @Override
-                    protected void updateItem(Boolean seleccionado,
-                                              boolean vacio) {
-                        super.updateItem(seleccionado, vacio);
-                        if (vacio) {
-                            setGraphic(null);
-                        } else {
-                            checkBox.setSelected(
-                                    Boolean.TRUE.equals(seleccionado));
-                            setGraphic(checkBox);
-                            setAlignment(Pos.CENTER);
-                        }
+            {
+                checkBox.setOnAction(e -> {
+                    ArticuloFila fila = getTableRow().getItem();
+                    if (fila != null) {
+                        fila.setSeleccionado(checkBox.isSelected());
+                        cambioSeleccion.accept(
+                            tabla.getItems().stream()
+                                .anyMatch(ArticuloFila::isSeleccionado));
                     }
                 });
+            }
+
+            @Override
+            protected void updateItem(Boolean seleccionado,
+                                        boolean vacio) {
+                super.updateItem(seleccionado, vacio);
+                if (vacio) {
+                    setGraphic(null);
+                } else {
+                    checkBox.setSelected(
+                            Boolean.TRUE.equals(seleccionado));
+                    setGraphic(checkBox);
+                    setAlignment(Pos.CENTER);
+                }
+            }
+        });
+
         colSeleccion.setPrefWidth(45);
 
         TableColumn<ArticuloFila, Integer> colId =
@@ -162,7 +166,7 @@ public class ArticulosView extends VBox {
         getChildren().addAll(
                 zonaFiltros, tabla, zonaAcciones, paginacion);
 
-        VBox.setVgrow(tabla, javafx.scene.layout.Priority.ALWAYS);
+        VBox.setVgrow(tabla, Priority.ALWAYS);
     }
 
 

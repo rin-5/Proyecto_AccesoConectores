@@ -1,5 +1,8 @@
 package com.ut3g6.aed_ut3_proyecto.view;
 
+import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
+import org.kordamp.ikonli.javafx.FontIcon;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -8,8 +11,6 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import org.kordamp.ikonli.javafx.FontIcon;
-import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 
 public class GeneralTemplateView extends BorderPane {
 
@@ -95,17 +96,29 @@ public class GeneralTemplateView extends BorderPane {
             "Gestión de artículos", vista, btnArticulos);
         });
 
-        btnDepositos.setOnAction(e ->
-                mostrarContenido("Gestión de depósitos",
-                        new DepositosView(), btnDepositos));
+        btnDepositos.setOnAction(e -> {
+            DepositosView vista =
+                new DepositosView(this::actualizarSeleccion);
+                
+            mostrarContenido(
+            "Gestión de depósitos", vista, btnDepositos);
+        });
 
-        btnEstantes.setOnAction(e ->
-                mostrarContenido("Gestión de estantes",
-                        new EstantesView(), btnEstantes));
+        btnEstantes.setOnAction(e -> {
+            EstantesView vista =
+                new EstantesView(this::actualizarSeleccion);
 
-        btnComponentes.setOnAction(e ->
-                mostrarContenido("Gestión de componentes",
-                        new ComponentesView(), btnComponentes));
+            mostrarContenido(
+            "Gestión de estantes", vista, btnEstantes);
+        });
+
+        btnComponentes.setOnAction(e -> {
+            ComponentesView vista =
+                new ComponentesView(this::actualizarSeleccion);
+
+            mostrarContenido(
+            "Gestión de componentes", vista, btnComponentes);
+        });
 
         VBox menu = new VBox(10);
         menu.setPadding(new Insets(20, 12, 20, 12));
@@ -202,7 +215,18 @@ public class GeneralTemplateView extends BorderPane {
         lblTitulo.setText(titulo);
         contenido.setCenter(vista);
 
-        configurarAcciones(vista instanceof ArticulosView);
+        if(vista instanceof ArticulosView){
+            configurarAcciones(vista instanceof ArticulosView);
+        }
+        if(vista instanceof DepositosView){
+            configurarAcciones(vista instanceof DepositosView);
+        }
+        if(vista instanceof EstantesView){
+            configurarAcciones(vista instanceof EstantesView);
+        }
+        if(vista instanceof ComponentesView){
+            configurarAcciones(vista instanceof ComponentesView);
+        }
     }
 
     private void aplicarEstilo(Button boton, String color) {
