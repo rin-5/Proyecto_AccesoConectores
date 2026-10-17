@@ -215,18 +215,12 @@ public class GeneralTemplateView extends BorderPane {
         lblTitulo.setText(titulo);
         contenido.setCenter(vista);
 
-        if(vista instanceof ArticulosView){
-            configurarAcciones(vista instanceof ArticulosView);
-        }
-        if(vista instanceof DepositosView){
-            configurarAcciones(vista instanceof DepositosView);
-        }
-        if(vista instanceof EstantesView){
-            configurarAcciones(vista instanceof EstantesView);
-        }
-        if(vista instanceof ComponentesView){
-            configurarAcciones(vista instanceof ComponentesView);
-        }
+        boolean esGestion = vista instanceof ArticulosView
+            || vista instanceof DepositosView
+            || vista instanceof EstantesView
+            || vista instanceof ComponentesView;
+
+        configurarAcciones(esGestion);
     }
 
     private void aplicarEstilo(Button boton, String color) {
