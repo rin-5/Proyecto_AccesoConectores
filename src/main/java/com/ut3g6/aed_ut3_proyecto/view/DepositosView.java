@@ -269,4 +269,11 @@ public class DepositosView extends VBox {
     public void recargarDepositos() {
         cargarDepositos();
     }
+
+    public List<Integer> obtenerIdsSeleccionados() {
+        return tabla.getItems().stream()
+                .filter(DepositoFila::isSeleccionado)
+                .map(DepositoFila::getId)
+                .collect(java.util.stream.Collectors.toList());
+    }
 }

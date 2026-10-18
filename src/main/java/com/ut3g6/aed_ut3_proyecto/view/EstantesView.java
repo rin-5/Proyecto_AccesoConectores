@@ -251,4 +251,11 @@ public class EstantesView extends VBox {
     public void recargarEstantes() {
         cargarEstantes();
     }
+
+    public List<String> obtenerIdsSeleccionados() {
+        return tabla.getItems().stream()
+                .filter(EstanteFila::isSeleccionado)
+                .map(EstanteFila::getId)
+                .collect(java.util.stream.Collectors.toList());
+    }
 }

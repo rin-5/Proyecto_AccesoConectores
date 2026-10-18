@@ -297,4 +297,11 @@ public class ComponentesView extends VBox {
     public void recargarComponentes() {
         cargarComponentes();
     }
+
+    public List<String> obtenerIdsSeleccionados() {
+        return tabla.getItems().stream()
+                .filter(ComponenteFila::isSeleccionado)
+                .map(ComponenteFila::getId)
+                .collect(java.util.stream.Collectors.toList());
+    }
 }

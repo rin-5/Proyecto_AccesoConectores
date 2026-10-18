@@ -316,4 +316,11 @@ public class ArticulosView extends VBox {
         cargarArticulos();
     }
 
+    public List<String> obtenerIdsSeleccionados() {
+        return tabla.getItems().stream()
+            .filter(ArticuloFila::isSeleccionado)
+            .map(ArticuloFila::getId)
+            .collect(java.util.stream.Collectors.toList());
+    }
+
 }

@@ -3,9 +3,12 @@ package com.ut3g6.aed_ut3_proyecto.view;
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.javafx.FontIcon;
 
+import com.ut3g6.aed_ut3_proyecto.controller.EliminarRegistrosDAO;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
@@ -35,6 +38,9 @@ public class GeneralTemplateView extends BorderPane {
     private final Button btnModificar = new Button("Modificar");
     private final Button btnEliminar = new Button("Eliminar");
     private final Button btnExportar = new Button("Exportar a CSV");
+
+    private final EliminarRegistrosDAO operaciones =
+        new EliminarRegistrosDAO();
 
     public GeneralTemplateView() {
         // Cabecera del contenido
@@ -192,6 +198,7 @@ public class GeneralTemplateView extends BorderPane {
 
         btnAnadir.setOnAction(e -> anadirRegistro());
         btnModificar.setOnAction(e -> modificarRegistro());
+        btnEliminar.setOnAction(e -> eliminarRegistros());
 
         btnModificar.setVisible(false);
         btnModificar.setManaged(false);
@@ -243,26 +250,6 @@ public class GeneralTemplateView extends BorderPane {
 
         return boton;
     }
-
-    // public void mostrarContenido(
-    //         String titulo, Node vista, Button boton) {
-    //     if (botonActivo != null) {
-    //         aplicarEstilo(botonActivo, colorBase);
-    //     }
-
-    //     botonActivo = boton;
-    //     aplicarEstilo(botonActivo, colorActivo);
-
-    //     lblTitulo.setText(titulo);
-    //     contenido.setCenter(vista);
-
-    //     boolean esGestion = vista instanceof ArticulosView
-    //         || vista instanceof DepositosView
-    //         || vista instanceof EstantesView
-    //         || vista instanceof ComponentesView;
-
-    //     configurarAcciones(esGestion);
-    // }
 
     public void mostrarContenido(
         String titulo, Node vista, Button boton) {
@@ -417,6 +404,99 @@ public class GeneralTemplateView extends BorderPane {
 
             formulario.showAndWait();
             vista.recargarComponentes();
+        }
+    }
+
+    private void eliminarRegistros() {
+        if (vistaActiva instanceof ArticulosView vista) {
+            var ids = vista.obtenerIdsSeleccionados();
+
+            if (ids.isEmpty()) {
+                mostrarAvisoSeleccion();
+                return;
+            }
+
+            new ConfirmarEliminacionView(
+                    "artículo", ids.size(),
+                    () -> ejecutarEliminacion(
+                            () -> operaciones.eliminarArticulos(ids),
+                            vista::recargarArticulos)
+            ).showAndWait();
+
+        } else if (vistaActiva instanceof DepositosView vista) {
+            var ids = vista.obtenerIdsSeleccionados();
+
+            if (ids.isEmpty()) {
+                mostrarAvisoSeleccion();
+                return;
+            }
+
+            new ConfirmarEliminacionView(
+                    "depósito", ids.size(),
+                    () -> ejecutarEliminacion(
+                            () -> operaciones.eliminarDepositos(ids),
+                            vista::recargarDepositos)
+            ).showAndWait();
+
+        } else if (vistaActiva instanceof EstantesView vista) {
+            var ids = vista.obtenerIdsSeleccionados();
+
+            if (ids.isEmpty()) {
+                mostrarAvisoSeleccion();
+                return;
+            }
+
+            new ConfirmarEliminacionView(
+                    "estante", ids.size(),
+                    () -> ejecutarEliminacion(
+                            () -> operaciones.eliminarEstantes(ids),
+                            vista::recargarEstantes)
+            ).showAndWait();
+
+        } else if (vistaActiva instanceof ComponentesView vista) {
+            var ids = vista.obtenerIdsSeleccionados();
+
+            if (ids.isEmpty()) {
+                mostrarAvisoSeleccion();
+                return;
+            }
+
+            new ConfirmarEliminacionView(
+                    "componente", ids.size(),
+                    () -> ejecutarEliminacion(
+                            () -> operaciones.eliminarComponentes(ids),
+                            vista::recargarComponentes)
+            ).showAndWait();
+        }
+    }
+
+    @FunctionalInterface
+    private interface OperacionDAO {
+        void ejecutar() throws java.sql.SQLException;
+    }
+
+    private void ejecutarEliminacion(
+            OperacionDAO operacion,
+            Runnable recargar) {
+
+        try {
+            operacion.ejecutar();
+            recargar.run();
+
+            Alert alerta = new Alert(Alert.AlertType.INFORMATION);
+            alerta.setTitle("Eliminación completada");
+            alerta.setHeaderText(null);
+            alerta.setContentText(
+                    "Los registros se han eliminado correctamente.");
+            alerta.showAndWait();
+
+        } catch (java.sql.SQLException ex) {
+            Alert alerta = new Alert(Alert.AlertType.ERROR);
+            alerta.setTitle("Error de eliminación");
+            alerta.setHeaderText(
+                    "No se han podido eliminar los registros.");
+            alerta.setContentText(ex.getMessage());
+            alerta.showAndWait();
         }
     }
 
