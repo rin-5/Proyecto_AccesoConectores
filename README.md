@@ -17,7 +17,11 @@ The project follows a **desktop client–database architecture**, with a JavaFX 
 
 This approach was chosen because it provides a straightforward way to persist structured inventory data, handle relationships between items and components, and perform database operations without requiring a separate web server. **Maven** manages project dependencies and builds, simplifying development and setup.
 
-**Technologies:** Java 21 · JavaFX 21.0.6 · Maven · JDBC · MariaDB · MariaDB Connector/J 3.5.10
+## Technologies
+
+![JavaFX](https://img.shields.io/badge/JavaFX-21-0078D7?style=for-the-badge&logo=openjdk&logoColor=white)
+![phpMyAdmin](https://img.shields.io/badge/phpMyAdmin-6C78AF?style=for-the-badge&logo=phpmyadmin&logoColor=white)
+![Java 21](https://img.shields.io/badge/Java-21-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)
 
 ## Installation
 
