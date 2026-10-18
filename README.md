@@ -11,6 +11,54 @@ A Java desktop application designed to manage warehouse inventory and its physic
 It supports the management of items, components, warehouses, shelves, and available stock quantities.
 The system stores information in MariaDB and provides a JavaFX interface for accessing and managing inventory data.
 
+## Project Tree Structure
+ ```bash
+Proyecto_AccesoConectores/
+├── .gitignore
+├── pom.xml
+├── README.md
+└── src/
+    └── main/
+        └── java/
+            └── com/
+                └── ut3g6/
+                    └── aed_ut3_proyecto/
+                        ├── AED_UT3_Proyecto.java
+                        ├── controller/
+                        │   ├── AlmacenarDAO.java
+                        │   ├── ArticuloDAO.java
+                        │   ├── ComponenteDAO.java
+                        │   ├── ComponerDAO.java
+                        │   ├── ConsultasAdicionalesDAO.java
+                        │   ├── DepositoDAO.java
+                        │   ├── EliminarRegistrosDAO.java
+                        │   ├── EstanteDAO.java
+                        │   ├── OperacionesAdicionalesDAO.java
+                        │   ├── TotalArticulosDAO.java
+                        │   └── TotalDepositosDAO.java
+                        ├── model/
+                        │   ├── Almacenar.java
+                        │   ├── Articulo.java
+                        │   ├── Componente.java
+                        │   ├── Componer.java
+                        │   ├── Conexion.java
+                        │   ├── Deposito.java
+                        │   └── Estante.java
+                        └── view/
+                            ├── ArticuloFormView.java
+                            ├── ArticulosView.java
+                            ├── ComponenteFormView.java
+                            ├── ComponentesView.java
+                            ├── ConfirmarEliminacionView.java
+                            ├── DepositoFormView.java
+                            ├── DepositosView.java
+                            ├── EstanteFormView.java
+                            ├── EstantesView.java
+                            ├── GeneralTemplateView.java
+                            ├── MainMenuView.java
+                            └── StartView.java
+  ```
+
 ## Architecture and Justification
 
 The project follows a **desktop client–database architecture**, with a JavaFX user interface (more up-to-date than Java Swing), Java application logic, and a MariaDB relational database accessed through **JDBC** (MariaDB Connector/J).
