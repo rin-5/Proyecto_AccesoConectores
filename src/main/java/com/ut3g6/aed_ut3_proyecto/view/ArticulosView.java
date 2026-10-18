@@ -7,8 +7,6 @@ import java.util.stream.Collectors;
 
 import com.ut3g6.aed_ut3_proyecto.controller.ConsultasAdicionalesDAO;
 import com.ut3g6.aed_ut3_proyecto.controller.ConsultasAdicionalesDAO.ArticuloInventario;
-import com.ut3g6.aed_ut3_proyecto.view.ArticulosView.ArticuloFila;
-import com.ut3g6.aed_ut3_proyecto.view.ComponentesView.ComponenteFila;
 
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
@@ -299,6 +297,23 @@ public class ArticulosView extends VBox {
             alerta.setContentText(ex.getMessage());
             alerta.showAndWait();
         }
+    }
+
+    public ArticuloFila obtenerArticuloSeleccionado() {
+        List<ArticuloFila> seleccionados = tabla.getItems()
+                .stream()
+                .filter(ArticuloFila::isSeleccionado)
+                .toList();
+
+        if (seleccionados.size() != 1) {
+                return null;
+        }
+
+        return seleccionados.get(0);
+    }
+
+    public void recargarArticulos() {
+        cargarArticulos();
     }
 
 }

@@ -253,4 +253,20 @@ public class DepositosView extends VBox {
         alerta.showAndWait();
     }
 
+    public DepositoFila obtenerDepositoSeleccionado() {
+        List<DepositoFila> seleccionados = tabla.getItems()
+                .stream()
+                .filter(DepositoFila::isSeleccionado)
+                .toList();
+
+        if (seleccionados.size() != 1) {
+            return null;
+        }
+
+        return seleccionados.get(0);
+    }
+
+    public void recargarDepositos() {
+        cargarDepositos();
+    }
 }

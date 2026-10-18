@@ -280,4 +280,21 @@ public class ComponentesView extends VBox {
             alerta.showAndWait();
         }
     }
+
+    public ComponenteFila obtenerComponenteSeleccionado() {
+        List<ComponenteFila> seleccionados = tabla.getItems()
+                .stream()
+                .filter(ComponenteFila::isSeleccionado)
+                .toList();
+
+        if (seleccionados.size() != 1) {
+                return null;
+        }
+
+        return seleccionados.get(0);
+    }
+
+    public void recargarComponentes() {
+        cargarComponentes();
+    }
 }

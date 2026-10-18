@@ -236,4 +236,19 @@ public class EstantesView extends VBox {
         alerta.showAndWait();
     }
 
+    public EstanteFila obtenerEstanteSeleccionado() {
+        List<EstanteFila> seleccionados = tabla.getItems().stream()
+                .filter(EstanteFila::isSeleccionado)
+                .collect(Collectors.toList());
+
+        if (seleccionados.size() != 1) {
+            return null;
+        }
+
+        return seleccionados.get(0);
+    }
+
+    public void recargarEstantes() {
+        cargarEstantes();
+    }
 }

@@ -18,6 +18,7 @@ public class GeneralTemplateView extends BorderPane {
     private final VBox subMenu;
     private final Label lblTitulo;
     private Button botonActivo;
+    private Node vistaActiva;
 
     private Button btnArticulos;
     private Button btnDepositos;
@@ -189,6 +190,9 @@ public class GeneralTemplateView extends BorderPane {
         aplicarEstiloAccion(btnEliminar, "#DC2626");
         aplicarEstiloAccion(btnExportar, colorBase);
 
+        btnAnadir.setOnAction(e -> anadirRegistro());
+        btnModificar.setOnAction(e -> modificarRegistro());
+
         btnModificar.setVisible(false);
         btnModificar.setManaged(false);
 
@@ -240,8 +244,29 @@ public class GeneralTemplateView extends BorderPane {
         return boton;
     }
 
+    // public void mostrarContenido(
+    //         String titulo, Node vista, Button boton) {
+    //     if (botonActivo != null) {
+    //         aplicarEstilo(botonActivo, colorBase);
+    //     }
+
+    //     botonActivo = boton;
+    //     aplicarEstilo(botonActivo, colorActivo);
+
+    //     lblTitulo.setText(titulo);
+    //     contenido.setCenter(vista);
+
+    //     boolean esGestion = vista instanceof ArticulosView
+    //         || vista instanceof DepositosView
+    //         || vista instanceof EstantesView
+    //         || vista instanceof ComponentesView;
+
+    //     configurarAcciones(esGestion);
+    // }
+
     public void mostrarContenido(
-            String titulo, Node vista, Button boton) {
+        String titulo, Node vista, Button boton) {
+
         if (botonActivo != null) {
             aplicarEstilo(botonActivo, colorBase);
         }
@@ -252,10 +277,12 @@ public class GeneralTemplateView extends BorderPane {
         lblTitulo.setText(titulo);
         contenido.setCenter(vista);
 
+        vistaActiva = vista;
+
         boolean esGestion = vista instanceof ArticulosView
-            || vista instanceof DepositosView
-            || vista instanceof EstantesView
-            || vista instanceof ComponentesView;
+                || vista instanceof DepositosView
+                || vista instanceof EstantesView
+                || vista instanceof ComponentesView;
 
         configurarAcciones(esGestion);
     }
@@ -304,5 +331,105 @@ public class GeneralTemplateView extends BorderPane {
 
         btnModificar.setDisable(!seleccionado);
         btnEliminar.setDisable(!seleccionado);
+    }
+
+    private void anadirRegistro() {
+        if (vistaActiva instanceof ArticulosView vista) {
+            ArticuloFormView formulario = new ArticuloFormView();
+            formulario.showAndWait();
+            vista.recargarArticulos();
+
+        } else if (vistaActiva instanceof DepositosView vista) {
+            DepositoFormView formulario = new DepositoFormView();
+            formulario.showAndWait();
+            vista.recargarDepositos();
+
+        } else if (vistaActiva instanceof EstantesView vista) {
+            EstanteFormView formulario = new EstanteFormView();
+            formulario.showAndWait();
+            vista.recargarEstantes();
+
+        } else if (vistaActiva instanceof ComponentesView vista) {
+            ComponenteFormView formulario = new ComponenteFormView();
+            formulario.showAndWait();
+            vista.recargarComponentes();
+        }
+    }
+
+    private void modificarRegistro() {
+        if (vistaActiva instanceof ArticulosView vista) {
+            ArticulosView.ArticuloFila articulo =
+                    vista.obtenerArticuloSeleccionado();
+
+            if (articulo == null) {
+                mostrarAvisoSeleccion();
+                return;
+            }
+
+            ArticuloFormView formulario =
+                    new ArticuloFormView(articulo);
+
+            formulario.showAndWait();
+            vista.recargarArticulos();
+
+        } else if (vistaActiva instanceof DepositosView vista) {
+            DepositosView.DepositoFila deposito =
+            vista.obtenerDepositoSeleccionado();
+
+            if (deposito == null) {
+                mostrarAvisoSeleccion();
+                return;
+            }
+
+            DepositoFormView formulario =
+                    new DepositoFormView(deposito);
+
+            formulario.showAndWait();
+            vista.recargarDepositos();
+
+        } else if (vistaActiva instanceof EstantesView vista) {
+            EstantesView.EstanteFila estante =
+            vista.obtenerEstanteSeleccionado();
+
+            if (estante == null) {
+                mostrarAvisoSeleccion();
+                return;
+            }
+
+            EstanteFormView formulario =
+                new EstanteFormView(estante);
+
+            formulario.showAndWait();
+            vista.recargarEstantes();
+
+        } else if (vistaActiva instanceof ComponentesView vista) {
+            ComponentesView.ComponenteFila componente =
+            vista.obtenerComponenteSeleccionado();
+
+            if (componente == null) {
+                mostrarAvisoSeleccion();
+                return;
+            }
+
+            ComponenteFormView formulario = new ComponenteFormView(
+                    componente
+                );
+
+            formulario.showAndWait();
+            vista.recargarComponentes();
+        }
+    }
+
+    private void mostrarAvisoSeleccion() {
+        javafx.scene.control.Alert alerta =
+                new javafx.scene.control.Alert(
+                        javafx.scene.control.Alert.AlertType.WARNING);
+
+        alerta.setTitle("Modificar registro");
+        alerta.setHeaderText(null);
+        alerta.setContentText(
+                "Selecciona exactamente un registro para modificar.");
+
+        alerta.showAndWait();
     }
 }
