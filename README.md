@@ -100,4 +100,4 @@ For the complete configuration procedure, screenshots, checks, and troubleshooti
 
 ## Additional Documentation
 
-For more information about the project's functionality, interface, and usage, refer to **[AED_Trabajo_Unidad (PDF)](docs/AEDT_Trabajo_Unidad_2.pdf)**. (special access permission required).
+For more information about the project's functionality, interface, and usage, refer to **[AED_Trabajo_Unidad (PDF)](docs/AEDT_Trabajo_Unidad_2.pdf)** (special access permission required).
